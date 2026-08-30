@@ -154,6 +154,8 @@ demand.
   - `armv7-linux-androideabi` (no serial enumeration)
 - FreeBSD
   - `x86_64-unknown-freebsd`
+- Illumos
+  - `x86_64-unknown-illumos`
 - Linux
   - `aarch64-unknown-linux-gnu`
   - `aarch64-unknown-linux-musl`

@@ -8,17 +8,34 @@ project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+### Changed
+### Fixed
+### Removed
+
+
+## [4.10.0] - 2026-08-24
+
+### Added
 
 * Provide USB port location in terms of bus and port chain via `UsbPortInfo`
   and `Location`.
   [#222](https://github.com/serialport/serialport-rs/issues/222)
   [#350](https://github.com/serialport/serialport-rs/pull/350)
   [#360](https://github.com/serialport/serialport-rs/pull/360)
+* Add new target illumos.
+  [#347](https://github.com/serialport/serialport-rs/pull/347)
 
 ### Changed
-### Fixed
-### Removed
 
+* Return error instead of panicking when reading inconsistent input/output
+  baudrates on some POSIX targets.
+  [#368](https://github.com/serialport/serialport-rs/pull/368)
+
+### Fixed
+
+* Accept dashes in serial number parsing on Windows.
+  [#351](https://github.com/serialport/serialport-rs/issues/351)
+  [#370](https://github.com/serialport/serialport-rs/issues/370)
 
 ## [4.9.0] - 2026-03-12
 
@@ -611,7 +628,8 @@ Unreleased, happened due to a user error using `cargo-release`.
 * Initial release.
 
 
-[Unreleased]: https://github.com/serialport/serialport-rs/compare/v4.9.0...HEAD
+[Unreleased]: https://github.com/serialport/serialport-rs/compare/v4.10.0...HEAD
+[4.10.0]: https://github.com/serialport/serialport-rs/compare/v4.9.0...v4.10.0
 [4.9.0]: https://github.com/serialport/serialport-rs/compare/v4.8.1...v4.9.0
 [4.8.1]: https://github.com/serialport/serialport-rs/compare/v4.8.0...v4.8.1
 [4.8.0]: https://github.com/serialport/serialport-rs/compare/v4.7.3...v4.8.0

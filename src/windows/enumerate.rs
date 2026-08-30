@@ -17,7 +17,7 @@ use windows_sys::Win32::System::Registry::{
 
 use crate::{Error, ErrorKind, Result, SerialPortInfo, SerialPortType, UsbPortInfo};
 
-const CONNECTOR_PUNCTUATION_SELECTION: &[char] = &[':', '_', '\u{ff3f}'];
+const CONNECTOR_PUNCTUATION_SELECTION: &[char] = &['-', ':', '_', '\u{ff3f}'];
 
 /// takes normal Rust `str` and outputs a null terminated UTF-16 encoded string
 fn as_utf16(utf8: &str) -> Vec<u16> {
@@ -795,7 +795,18 @@ mod tests {
                 serial: Some("B4:3A:45:B0:08:24"),
                 interface: None,
             },
-        )
+        );
+
+        // And there alre also devices using dashes. See issue #351.
+        assert_eq!(
+            HwidMatches::new("USB\\VID_303A&PID_1001\\SERIAL-123-456").unwrap(),
+            HwidMatches {
+                vid: "303A",
+                pid: "1001",
+                serial: Some("SERIAL-123-456"),
+                interface: None,
+            },
+        );
     }
 
     #[test]
