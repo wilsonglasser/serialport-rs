@@ -20,7 +20,7 @@ jobs:
     steps:
         # TODO: Harmonize with build.yaml
       - name: Fmt | checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Fmt | install toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -40,12 +40,15 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     env:
+      # Enable cross compilation for `pkg_config`.
+      PKG_CONFIG_ALLOW_CROSS: 1
       RUSTFLAGS: -Dwarnings
     strategy:
       matrix:
         target:
           - aarch64-apple-darwin
           - arm-linux-androideabi
+          - powerpc64-unknown-linux-gnu
           - x86_64-pc-windows-msvc
           - x86_64-unknown-freebsd
           - x86_64-unknown-illumos
@@ -58,7 +61,7 @@ jobs:
           sudo sed -i 's/azure.archive.ubuntu.com/archive.ubuntu.com/' /etc/apt/sources.list
           sudo apt-get -qq update
           sudo apt install -qq -y libudev-dev
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.target }}
@@ -100,7 +103,7 @@ jobs:
           sudo sed -i 's/azure.archive.ubuntu.com/archive.ubuntu.com/' /etc/apt/sources.list
           sudo apt-get -qq update
           sudo apt install -qq -y libudev-dev
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@nightly
       - uses: dtolnay/install@cargo-docs-rs
       - run: cargo docs-rs
@@ -112,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Links | checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Links | check
         id: lychee
@@ -142,6 +145,18 @@ jobs:
       target: arm-linux-androideabi
       toolchain: "1.59.0"
       pin-incompatible-msrv-bump-dependencies: true
+
+  msrv-powerpc64-unknown-linux-gnu:
+    uses: ./.github/workflows/build.yaml
+    with:
+      disable_extra_builds: true
+      disable_tests: true
+      extra_packages: libudev-dev gcc-powerpc64-linux-gnu libc6-dev-ppc64-cross
+      target: powerpc64-unknown-linux-gnu
+      toolchain: "1.59.0"
+      pin-incompatible-msrv-bump-dependencies: true
+
+  # There is no support for powerpc64-unknown-linux-musl with Rust 1.59.0.
 
   msrv-x86_64-unknown-freebsd:
     uses: ./.github/workflows/build.yaml
@@ -210,11 +225,15 @@ jobs:
 
   semver:
     runs-on: ubuntu-latest
+    env:
+      # Enable cross compilation for `pkg_config`.
+      PKG_CONFIG_ALLOW_CROSS: 1
     strategy:
       matrix:
         target:
           - aarch64-apple-darwin
           - arm-linux-androideabi
+          - powerpc64-unknown-linux-gnu
           - x86_64-pc-windows-msvc
           - x86_64-unknown-freebsd
           - x86_64-unknown-illumos
@@ -229,7 +248,7 @@ jobs:
           sudo sed -i 's/azure.archive.ubuntu.com/archive.ubuntu.com/' /etc/apt/sources.list
           sudo apt-get -qq update
           sudo apt-get -qq -y install build-essential curl git pkg-config libudev-dev
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           target: ${{ matrix.target }}
@@ -254,7 +273,7 @@ jobs:
     continue-on-error: ${{ matrix.checks == 'advisories' }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: EmbarkStudios/cargo-deny-action@v2
       with:
         command: check ${{ matrix.checks }}
@@ -325,6 +344,22 @@ jobs:
       extra_packages: libudev-dev gcc-multilib
       target: i686-unknown-linux-musl
 
+  powerpc64-unknown-linux-gnu:
+    uses: ./.github/workflows/build.yaml
+    with:
+      disable_extra_builds: true
+      disable_tests: true
+      extra_packages: libudev-dev gcc-powerpc64-linux-gnu libc6-dev-ppc64-cross
+      target: powerpc64-unknown-linux-gnu
+
+  powerpc64-unknown-linux-musl:
+    uses: ./.github/workflows/build.yaml
+    with:
+      disable_extra_builds: true
+      disable_tests: true
+      extra_packages: gcc-powerpc64-linux-gnu
+      target: powerpc64-unknown-linux-musl
+
   x86_64-apple-darwin:
     uses: ./.github/workflows/build.yaml
     with:
@@ -367,6 +402,7 @@ jobs:
       disable_extra_builds: true
       disable_tests: true
       target: x86_64-unknown-netbsd
+
   x86_64-unknown-illumos:
     uses: ./.github/workflows/build.yaml
     with:
